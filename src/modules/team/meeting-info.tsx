@@ -20,6 +20,7 @@ import {
 import { useOnceCall } from "../../hooks/use-once-call";
 import { SPECIALIZATION } from "../../lib/constants";
 import { SelectSpecialization } from "../select-specialization";
+import { ScrollArea } from "../../components/scroll-area";
 
 interface MeetingInfoProps {
   meetingLink: string;
@@ -103,28 +104,32 @@ export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
           <CardTitle className={`text-3xl`}>Teams Meeting Link</CardTitle>
         </CardHeader>
         <CardContent>
+          <ScrollArea className="h-[80px] p-4 border rounded-md">
+            {meetingLink}
+          </ScrollArea>
+
           <Button
             onClick={() => {
               copy(meetingLink);
             }}
+            className={`mt-8`}
           >
             Copy Link
           </Button>
 
           <div className={`mt-8`}>
             <strong>Note:</strong>
-            <p className={`ml-3`}>
-              <ol>
-                <li className={`my-4`}>
-                  1. Share this teams link with your teammates. Please make sure
-                  to not share this links with anyone other that your teammates.
-                </li>
-                <li>
-                  2. Strict action will be taken by the hackathon organizers, if
-                  found sharing the links with other that the teammates.
-                </li>
-              </ol>
-            </p>
+
+            <ol className={`ml-3`}>
+              <li className={`my-4`}>
+                1. Share this teams link with your teammates. Please make sure
+                to not share this links with anyone other that your teammates.
+              </li>
+              <li>
+                2. Strict action will be taken by the hackathon organizers, if
+                found sharing the links with other that the teammates.
+              </li>
+            </ol>
           </div>
 
           <div className={`my-8`}>

@@ -18,22 +18,78 @@ import {
 } from "../../components/popover";
 import { SelectSpecialization } from "../select-specialization";
 
+import { SPECIALIZATION } from "../../lib/constants";
+import { useOnceCall } from "../../hooks/use-once-call";
+
 export const MentorInfo = () => {
   const [specialization, setSpecialization] = useState<undefined | string>(
     undefined
   );
   const [meetingUrl, setMeetingUrl] = useState<undefined | string>(undefined);
+  const [isInMeeting, setIsInMeeting] = useState(false);
+  const [isOpenMeetingBtnDisabled, setIsOpenMeetingBtnDisabled] =
+    useState(true);
+  const [queueId, setQueueId] = useState<undefined | string>(undefined);
+
+  // useOnceCall(() => {
+  //   const userDataString = localStorage.getItem("user_data");
+  //   if (!userDataString) return;
+  //   const userData = JSON.parse(userDataString);
+
+  //   if (userData.queue) {
+  //     setSpecialization(userData.specializationId);
+  //   }
+  // });
 
   const handleSubmit = async (specializationId: string | undefined) => {
     if (!specializationId) return;
 
-    const { data } = await axios({
+    const res = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/queue/next`,
       data: { specialization: specializationId },
     });
 
-    setMeetingUrl(data.data);
+    const data = res.data.data;
+
+    if (data == "") {
+      alert(
+        `There is no pending mentor request for ${
+          Object.entries(SPECIALIZATION).find(
+            ([id, _name]) => id === specializationId
+          )?.[1]
+        }`
+      );
+
+      return;
+    }
+
+    const url = data.meetingLink;
+
+    setMeetingUrl(url);
+    setIsOpenMeetingBtnDisabled(!url);
+    setQueueId(data.queueItem.id);
+  };
+
+  const handleFinishMeeting = async (queueId: string | undefined) => {
+    if (!queueId) return;
+
+    // const mentorDataString = localStorage.getItem("mentor_data");
+    // if (!mentorDataString) return;
+    // const mentorData = JSON.parse(mentorDataString);
+
+    await axios({
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/queue/delete`,
+      data: { queueId },
+    });
+
+    setQueueId(undefined);
+
+    // localStorage.setItem(
+    //   "mentor_data",
+    //   JSON.stringify({ ...mentorData, queue: undefined })
+    // );
   };
 
   return (
@@ -44,11 +100,22 @@ export const MentorInfo = () => {
         </CardHeader>
         <CardContent>
           <div className={`mt-8`}>
-            <strong>Note:</strong>
+            <strong>How to use</strong>
             <p className={`ml-3`}>
               <ol>
-                <li className={`my-4`}>1. Do not try to spam the button.</li>
-                <li>2. Bla Bla Bla</li>
+                <li className={`my-4`}>
+                  1. Select your specialization and click on &quot;Find
+                  Meeting&quot; button.
+                </li>
+                <li className={`my-4`}>
+                  2. If a meeting is available, you will be able to click the
+                  &quot;Open Meeting&quot; button.
+                </li>
+                <li>
+                  3. After you are done with your meeting, please click the
+                  &quot;Finish Meeting&quot; button, to close the student
+                  request.
+                </li>
               </ol>
             </p>
           </div>
@@ -79,22 +146,46 @@ export const MentorInfo = () => {
             <div>
               <SelectSpecialization
                 value={specialization}
-                onValueChange={(val) => setSpecialization(val)}
+                onValueChange={(val) => {
+                  setSpecialization(val);
+                  setIsOpenMeetingBtnDisabled(true);
+                }}
               />
 
               <div className="flex justify-between mt-5">
                 <Button
-                  onClick={() => {
-                    handleSubmit(specialization);
+                  onClick={async () => {
+                    await handleSubmit(specialization);
                   }}
                   disabled={!specialization}
                 >
                   Find Meeting
                 </Button>
 
-                <a href={meetingUrl} target="_blank">
-                  <Button disabled={!meetingUrl}>Open Meeting</Button>
-                </a>
+                {!isInMeeting ? (
+                  <Button
+                    disabled={isOpenMeetingBtnDisabled}
+                    onClick={() => {
+                      setIsInMeeting(true);
+                    }}
+                  >
+                    <a
+                      href={isOpenMeetingBtnDisabled ? "#" : meetingUrl}
+                      target="_blank"
+                    >
+                      Open Meeting
+                    </a>
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setIsInMeeting(false);
+                      handleFinishMeeting(queueId);
+                    }}
+                  >
+                    Finish Meeting
+                  </Button>
+                )}
               </div>
             </div>
           </div>

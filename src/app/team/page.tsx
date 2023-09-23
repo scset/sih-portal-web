@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { useOnceCall } from "../../hooks/use-once-call";
-import GetMeetingLink from "../../modules/team/get-meeting-link";
+import GetMeetingLink from "../../modules/team/meeting-link";
 import { MeetingInfo } from "../../modules/team/meeting-info";
 
 export default function StudentPage() {

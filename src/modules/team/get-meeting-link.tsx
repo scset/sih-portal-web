@@ -28,8 +28,8 @@ export default function GetMeetingLink() {
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/meeting/enrollment`,
       data: {
-        teamMemberEnrollment1: en1,
-        teamMemberEnrollment2: en2,
+        teamMemberEnrollment1: en1.toUpperCase(),
+        teamMemberEnrollment2: en2.toUpperCase(),
       },
     });
 

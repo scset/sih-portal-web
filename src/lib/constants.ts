@@ -1,4 +1,5 @@
 export const SPECIALIZATION = {
+  "6e8cd849-187a-4312-a003-db71570bc18d": "General Request",
   "2aa6976f-ddcd-4384-b6a8-d5ccf6483d30": "Artificial Intelligence",
   "4964a09c-e33f-467a-aac5-982e41c64abd": "Robotics Process Automation",
   "49c44b3d-13be-430d-83ad-f88a4de9bd9b": "Product Design Technology",

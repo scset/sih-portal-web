@@ -17,10 +17,8 @@ import { Input } from "../../components/input";
 import { Label } from "../../components/label";
 
 export const MentorLogin = () => {
-  const [email, setEmail] = useState("E23CSEUe58ed9@bennett.edu.in");
-  const [password, setPassword] = useState(
-    "0d455f62-f608-4503-befb-eaa02eb2677c"
-  );
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {

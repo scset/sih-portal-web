@@ -17,8 +17,8 @@ import { Input } from "../../components/input";
 import { Label } from "../../components/label";
 
 export default function GetMeetingLink() {
-  const [en1, setEn1] = useState("E23CSEU8851ad");
-  const [en2, setEn2] = useState("E23CSEUbcf9b0");
+  const [en1, setEn1] = useState("");
+  const [en2, setEn2] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {

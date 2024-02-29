@@ -5,17 +5,22 @@ import { useState } from "react";
 import { useOnceCall } from "../../hooks/use-once-call";
 import GetMeetingLink from "../../modules/team/meeting-link";
 import { MeetingInfo } from "../../modules/team/meeting-info";
+import axios from "axios";
 
 export default function StudentPage() {
   const [meetingLink, setMeetingLink] = useState(null);
 
-  useOnceCall(() => {
-    const userDataString = localStorage.getItem("user_data");
+  useOnceCall(async () => {
+    const groupId = localStorage.getItem("group_id");
+    if (!groupId) return;
 
-    if (userDataString) {
-      const userData = JSON.parse(userDataString);
-      if (userData.meetingLink) setMeetingLink(userData.meetingLink);
-    }
+    const { data } = await axios({
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/meeting/url`,
+      data: { groupId },
+    });
+
+    setMeetingLink(data.data);
   });
 
   if (!meetingLink) return <GetMeetingLink />;

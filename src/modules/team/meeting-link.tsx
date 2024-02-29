@@ -33,10 +33,7 @@ export default function GetMeetingLink() {
       },
     });
 
-    localStorage.setItem(
-      "user_data",
-      JSON.stringify({ type: "TEAM", en1, en2, ...data.data })
-    );
+    localStorage.setItem("group_id", data.data.groupId);
 
     setIsLoading(false);
     location.reload();

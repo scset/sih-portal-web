@@ -24,7 +24,7 @@ export const MentorLogin = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
 
-    await axios({
+    const { data } = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/mentor/login`,
       data: {
@@ -33,10 +33,7 @@ export const MentorLogin = () => {
       },
     });
 
-    localStorage.setItem(
-      "mentor_data",
-      JSON.stringify({ type: "MENTOR", email })
-    );
+    localStorage.setItem("mentor_id", data.mentor.id);
 
     setIsLoading(false);
     location.reload();
@@ -46,7 +43,7 @@ export const MentorLogin = () => {
     <div className={`grid place-items-center min-h-[100vh]`}>
       <Card className="w-[400px]">
         <CardHeader className={`mb-2`}>
-          <CardTitle className={`text-3xl mb-4`}>Get Meeting Links</CardTitle>
+          <CardTitle className={`text-3xl mb-4`}>Mentor Login</CardTitle>
           <CardDescription className={`mb-4`}>
             Please enter your Bennett Email Address and the password provided on
             your email address
@@ -58,7 +55,7 @@ export const MentorLogin = () => {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Email Address</Label>
                 <Input
-                  id="name"
+                  id="email"
                   placeholder="Email Address"
                   type="email"
                   value={email}
@@ -73,7 +70,7 @@ export const MentorLogin = () => {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Password</Label>
                 <Input
-                  id="name"
+                  id="password"
                   placeholder="Password"
                   type="password"
                   value={password}

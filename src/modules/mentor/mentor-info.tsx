@@ -25,21 +25,19 @@ export const MentorInfo = () => {
   const [specialization, setSpecialization] = useState<undefined | string>(
     undefined
   );
+  const [mentorId, setMentorId] = useState<undefined | string>(undefined);
   const [meetingUrl, setMeetingUrl] = useState<undefined | string>(undefined);
   const [isInMeeting, setIsInMeeting] = useState(false);
   const [isOpenMeetingBtnDisabled, setIsOpenMeetingBtnDisabled] =
     useState(true);
   const [queueId, setQueueId] = useState<undefined | string>(undefined);
 
-  // useOnceCall(() => {
-  //   const userDataString = localStorage.getItem("user_data");
-  //   if (!userDataString) return;
-  //   const userData = JSON.parse(userDataString);
+  useOnceCall(() => {
+    const mentorId = localStorage.getItem("mentor_id");
+    if (!mentorId) return;
 
-  //   if (userData.queue) {
-  //     setSpecialization(userData.specializationId);
-  //   }
-  // });
+    setMentorId(mentorId);
+  });
 
   const handleSubmit = async (specializationId: string | undefined) => {
     if (!specializationId) return;
@@ -47,7 +45,7 @@ export const MentorInfo = () => {
     const res = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/queue/next`,
-      data: { specialization: specializationId },
+      data: { specialization: specializationId, mentorId: mentorId },
     });
 
     const data = res.data.data;
@@ -74,22 +72,16 @@ export const MentorInfo = () => {
   const handleFinishMeeting = async (queueId: string | undefined) => {
     if (!queueId) return;
 
-    // const mentorDataString = localStorage.getItem("mentor_data");
-    // if (!mentorDataString) return;
-    // const mentorData = JSON.parse(mentorDataString);
-
     await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/queue/delete`,
       data: { queueId },
     });
 
+    setMeetingUrl(undefined);
+    setIsInMeeting(false);
+    setIsOpenMeetingBtnDisabled(true);
     setQueueId(undefined);
-
-    // localStorage.setItem(
-    //   "mentor_data",
-    //   JSON.stringify({ ...mentorData, queue: undefined })
-    // );
   };
 
   return (

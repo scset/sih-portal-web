@@ -27,19 +27,30 @@ interface MeetingInfoProps {
 }
 
 export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
-  const [specialization, setSpecialization] = useState<undefined | string>(
+  const [specializationId, setSpecializationId] = useState<undefined | string>(
     undefined
   );
   const [isAlreadyInQueue, setIsAlreadyInQueue] = useState(false);
-  const [queueId, setQueueId] = useState(undefined);
+  const [queueId, setQueueId] = useState<undefined | string>(undefined);
 
-  useOnceCall(() => {
-    const userDataString = localStorage.getItem("user_data");
-    if (!userDataString) return;
-    const userData = JSON.parse(userDataString);
+  useOnceCall(async () => {
+    const groupId = localStorage.getItem("group_id");
+    console.log({ groupId });
+    if (!groupId) return;
 
-    if (userData.queue) {
-      setSpecialization(userData.specializationId);
+    const { data } = await axios({
+      method: "post",
+      url: `${process.env.NEXT_PUBLIC_API_URL}/queue/find`,
+      data: {
+        groupId: groupId,
+      },
+    });
+
+    const qi = data.data.queueItem;
+
+    if (qi) {
+      setSpecializationId(qi.specializationId);
+      setQueueId(qi.id);
       setIsAlreadyInQueue(true);
     }
   });
@@ -47,40 +58,24 @@ export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
   const handleSubmit = async (specializationId: string | undefined) => {
     if (!specializationId) return;
 
-    const userDataString = localStorage.getItem("user_data");
-    if (!userDataString) return;
-    const userData = JSON.parse(userDataString);
+    const groupId = localStorage.getItem("group_id");
+    if (!groupId) return;
 
     const { data } = await axios({
       method: "post",
       url: `${process.env.NEXT_PUBLIC_API_URL}/queue/add`,
       data: {
         specializationId: specializationId,
-        groupId: userData.groupId,
+        groupId: groupId,
       },
     });
 
-    const queueIdString = data.data;
-
+    setQueueId(data.queueId);
     setIsAlreadyInQueue(true);
-    setQueueId(queueIdString);
-
-    localStorage.setItem(
-      "user_data",
-      JSON.stringify({
-        ...userData,
-        specializationId: specialization,
-        queue: queueIdString,
-      })
-    );
   };
 
   const handleQueueItemDelete = async (queueId: string | undefined) => {
     if (!queueId) return;
-
-    const userDataString = localStorage.getItem("user_data");
-    if (!userDataString) return;
-    const userData = JSON.parse(userDataString);
 
     await axios({
       method: "post",
@@ -88,13 +83,10 @@ export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
       data: { queueId },
     });
 
-    setIsAlreadyInQueue(false);
     setQueueId(undefined);
+    setSpecializationId(undefined);
 
-    localStorage.setItem(
-      "user_data",
-      JSON.stringify({ ...userData, queue: undefined })
-    );
+    setIsAlreadyInQueue(false);
   };
 
   return (
@@ -160,16 +152,16 @@ export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
 
             <div>
               <SelectSpecialization
-                value={specialization}
-                onValueChange={(val) => setSpecialization(val)}
+                value={specializationId}
+                onValueChange={(val) => setSpecializationId(val)}
                 disabled={isAlreadyInQueue}
               />
               <Button
                 onClick={() => {
-                  handleSubmit(specialization);
+                  handleSubmit(specializationId);
                 }}
                 className={`mt-4`}
-                disabled={!specialization || isAlreadyInQueue}
+                disabled={!specializationId || isAlreadyInQueue}
               >
                 Request Mentor
               </Button>
@@ -191,7 +183,7 @@ export const MeetingInfo: React.FC<MeetingInfoProps> = ({ meetingLink }) => {
                   <span>
                     {
                       Object.entries(SPECIALIZATION).find(
-                        ([id, _name]) => id === specialization
+                        ([id, _name]) => id === specializationId
                       )?.[1]
                     }
                   </span>

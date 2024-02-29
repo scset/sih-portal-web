@@ -10,12 +10,10 @@ export default function MentorPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useOnceCall(() => {
-    const mentorDataString = localStorage.getItem("mentor_data");
+    const mentorId = localStorage.getItem("mentor_id");
 
-    if (!mentorDataString) return;
-
-    const mentorData = JSON.parse(mentorDataString);
-    if (mentorData.email) setIsLoggedIn(true);
+    if (!mentorId) return;
+    setIsLoggedIn(true);
   });
 
   if (!isLoggedIn) return <MentorLogin />;
